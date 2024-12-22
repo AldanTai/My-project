@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI; // 引入 UI 命名空間
 
 public class PlayerController : MonoBehaviour
 {
@@ -10,13 +11,13 @@ public class PlayerController : MonoBehaviour
     private bool nearFlag = false; // 是否靠近旗子
 
     public GameObject popupWindow; // 彈窗 UI
-    public GameObject closeButtonObject; // 關閉按鈕的物件
+    public Button closeButton; // 關閉按鈕（Button 元素）
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
 
-        // 隱藏彈窗 UI 和關閉按鈕
+        // 隱藏彈窗 UI
         if (popupWindow != null)
         {
             popupWindow.SetActive(false);
@@ -27,10 +28,11 @@ public class PlayerController : MonoBehaviour
             Debug.LogError("PopupWindow 未設置！");
         }
 
-        if (closeButtonObject != null)
+        // 檢查並添加按鈕點擊事件
+        if (closeButton != null)
         {
-            closeButtonObject.SetActive(false);
-            Debug.Log("CloseButton 已隱藏");
+            closeButton.gameObject.SetActive(false); // 遊戲開始時隱藏按鈕
+            closeButton.onClick.AddListener(CloseWindow); // 添加點擊事件
         }
         else
         {
@@ -49,18 +51,12 @@ public class PlayerController : MonoBehaviour
             Debug.Log("視窗彈出！");
             ShowWindow();
         }
-
-        // 檢測滑鼠左鍵點擊關閉按鈕物件
-        if (Input.GetMouseButtonDown(0)) // 左鍵點擊
-        {
-            CheckButtonClick();
-        }
     }
 
     void FixedUpdate()
     {
         // 移動角色
-        rb.linearVelocity = new Vector2(movement.x * moveSpeed, rb.linearVelocity.y);
+        rb.velocity = new Vector2(movement.x * moveSpeed, rb.velocity.y);
     }
 
     void OnTriggerEnter2D(Collider2D collision)
@@ -88,22 +84,9 @@ public class PlayerController : MonoBehaviour
             popupWindow.SetActive(true); // 顯示彈窗
         }
 
-        if (closeButtonObject != null)
+        if (closeButton != null)
         {
-            closeButtonObject.SetActive(true); // 顯示關閉按鈕
-        }
-    }
-
-    void CheckButtonClick()
-    {
-        // 創建從滑鼠指向場景的射線
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit2D hit = Physics2D.GetRayIntersection(ray);
-
-        if (hit.collider != null && hit.collider.gameObject == closeButtonObject)
-        {
-            Debug.Log("關閉按鈕被點擊！");
-            CloseWindow();
+            closeButton.gameObject.SetActive(true); // 顯示關閉按鈕
         }
     }
 
@@ -114,9 +97,9 @@ public class PlayerController : MonoBehaviour
             popupWindow.SetActive(false); // 隱藏彈窗
         }
 
-        if (closeButtonObject != null)
+        if (closeButton != null)
         {
-            closeButtonObject.SetActive(false); // 隱藏按鈕
+            closeButton.gameObject.SetActive(false); // 隱藏關閉按鈕
         }
 
         Debug.Log("視窗已關閉");
